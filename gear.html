@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <!-- Bootstrap CSS -->
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+            integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+            crossorigin="anonymous"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+        />
+        <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css" />
+        <script
+            src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"
+            integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+            crossorigin="anonymous"
+        ></script>
+        <script defer src="https://leanny.github.io/splat3/js/dist/json-formatter.umd.js" charset="UTF-8"></script>
+        <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
+        <title>Splatoon 3 - Gear Codename Database</title>
+        <style>
+            body {
+                background-color: #e9ecef;
+            }
+            footer {
+                border-top: 1px solid rgba(86, 61, 124, 0.2);
+            }
+            .bd-placeholder-img {
+                font-size: 1.125rem;
+                text-anchor: middle;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            @media (min-width: 768px) {
+                .bd-placeholder-img-lg {
+                    font-size: 3.5rem;
+                }
+            }
+            .themed-grid-col {
+                padding-top: 15px;
+                padding-bottom: 15px;
+                background-color: rgba(86, 61, 124, 0.15);
+                border: 1px solid rgba(86, 61, 124, 0.2);
+            }
+            #parameterContent {
+                margin-top: 1em;
+                border: 1px solid rgba(54, 38, 78, 0.2);
+                background-color: rgba(34, 19, 56, 0.2);
+            }
+            h2 {
+                margin: 1rem;
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Gear Codename Database</a>
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-toggle="collapse"
+                data-target="#navbarCollapse"
+                aria-controls="navbarCollapse"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse"></div>
+        </nav>
+        <main role="main">
+            <div class="jumbotron">
+                <div class="col-sm-8 mx-auto">
+                    <h1>Splatoon 3 - Gear Codename Database</h1>
+                    <ul class="nav nav-tabs" id="modes" role="tablist"></ul>
+                    <div class="tab-content" id="modeTabControl"></div>
+                    <div id="content"></div>
+                </div>
+            </div>
+            <script type="module">
+                import {
+                    generateHeader,
+                    get_prefix,
+                    localize,
+                    get_image_tag,
+                    format_img,
+                    add_tab,
+                    add_table,
+                    get_latest
+                } from "./js/Utility.js"
+                generateHeader($("#navbarCollapse"))
+                const prefix = get_prefix()
+                const site_prefix = "https://leanny.github.io/splat3/"
+                var latest = 700
+                var lang_dict = {}
+
+                var adjustFormatter = value => {
+                    switch (value) {
+                        case 0:
+                            return `<p>No</p>`
+                        case 1:
+                            return `<p>Yes</p>`
+                    }
+                }
+
+                var gearImgFormatter = value =>
+                    `<center>${format_img(site_prefix + "images/gear/", value, 128)}</center>`
+
+                var headFormatter = value => {
+                    const tname = localize("CommonMsg/Gear/GearName_Head", value.replace("Hed_", ""))
+                    return `<p>${tname}</p>`
+                }
+
+                var clothingFormatter = value => {
+                    const tname = localize("CommonMsg/Gear/GearName_Clothes", value.replace("Clt_", ""))
+                    return `<p>${tname}</p>`
+                }
+
+                var shoesFormatter = value => {
+                    const tname = localize("CommonMsg/Gear/GearName_Shoes", value.replace("Shs_", ""))
+                    return `<p>${tname}</p>`
+                }
+
+                window.adjustFormatter = adjustFormatter
+
+                window.headFormatter = headFormatter
+                window.clothingFormatter = clothingFormatter
+                window.shoesFormatter = shoesFormatter
+
+                window.gearImgFormatter = gearImgFormatter
+
+                window.lang_dict = lang_dict
+                $.getJSON("https://leanny.github.io/splat3/data/language/USen.json", function (d) {
+                    $.each(d, function (key, val) {
+                        lang_dict[key] = val
+                    })
+                    load_data()
+                })
+
+                function load_data() {
+                    $.getJSON(site_prefix + `data/mush/${latest}/GearInfoClothes.json`, data_dict => {
+                            var res = []
+                            for (const value of data_dict) {
+                                res.push({
+                                    name: value.__RowId,
+                                    id: value.Id,
+                                    variations: value.VariationNum
+                                })
+                            }
+                            $(`#cloth-table`).bootstrapTable("refreshOptions", { data: res, sortName: "SortId" })
+                        }
+                    )
+                    $.getJSON(site_prefix + `data/mush/${latest}/GearInfoShoes.json`, data_dict => {
+                            var res = []
+                            for (const value of data_dict) {
+                                res.push({
+                                    name: value.__RowId,
+                                    id: value.Id,
+                                    variations: value.VariationNum
+                                })
+                            }
+                            $(`#shoe-table`).bootstrapTable("refreshOptions", { data: res, sortName: "SortId" })
+                        }
+                    )
+                    $.getJSON(site_prefix + `data/mush/${latest}/GearInfoHead.json`, data_dict => {
+                            var res = []
+                            for (const value of data_dict) {
+                                res.push({
+                                    name: value.__RowId,
+                                    id: value.Id,
+                                    variations: value.VariationNum
+                                })
+                            }
+                            $(`#head-table`).bootstrapTable("refreshOptions", { data: res, sortName: "SortId" })
+                        }
+                    )
+                }
+
+                $(function () {
+                    $("#version").change(function () {
+                        load_data()
+                    })
+                    add_tab("head", "Headgear")
+                    add_tab("cloth", "Clothes")
+                    add_tab("shoe", "Shoes")
+
+                    add_table("head", "head-table", [
+                        {
+                            Field: "name",
+                            Label: "Image",
+                            formatter: "gearImgFormatter"
+                        },
+                        {
+                            Field: "name",
+                            Label: "Internal Name"
+                        },
+                        {
+                            Field: "name",
+                            Label: "Name",
+                            formatter: "headFormatter"
+                        },
+                        {
+                            Field: "id",
+                            Label: "Gear ID"
+                        },
+                        {
+                            Field: "variations",
+                            Label: "Adjustable?",
+                            formatter: "adjustFormatter"
+                        },
+                    ])
+
+                    add_table("cloth", "cloth-table", [
+                        {
+                            Field: "name",
+                            Label: "Image",
+                            formatter: "gearImgFormatter"
+                        },
+                        {
+                            Field: "name",
+                            Label: "Internal Name"
+                        },
+                        {
+                            Field: "name",
+                            Label: "Name",
+                            formatter: "clothingFormatter"
+                        },
+                        {
+                            Field: "id",
+                            Label: "Gear ID"
+                        },
+                        {
+                            Field: "variations",
+                            Label: "Adjustable?",
+                            formatter: "adjustFormatter"
+                        },
+                    ])
+
+                    add_table("shoe", "shoe-table", [
+                        {
+                            Field: "name",
+                            Label: "Image",
+                            formatter: "gearImgFormatter"
+                        },
+                        {
+                            Field: "name",
+                            Label: "Internal Name"
+                        },
+                        {
+                            Field: "name",
+                            Label: "Name",
+                            formatter: "shoesFormatter"
+                        },
+                        {
+                            Field: "id",
+                            Label: "Gear ID"
+                        },
+                        {
+                            Field: "variations",
+                            Label: "Adjustable?",
+                            formatter: "adjustFormatter"
+                        },
+                    ])
+                })
+            </script>
+        </main>
+        <footer class="footer" id="footer">
+            <script type="module">
+                import { generateFooter } from "./js/Utility.js"
+                generateFooter($("#footer"))
+            </script>
+        </footer>
+    </body>
+</html>

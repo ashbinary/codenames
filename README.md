@@ -1,0 +1,1 @@
+# Codename database for Splatoon 3
