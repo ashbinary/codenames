@@ -2,10 +2,13 @@ export function generateHeader(elem) {
     elem.append(`
 <ul class="navbar-nav mr-auto">
     <li class="nav-item">
-    <a class="nav-link" href="index.html">Weapon Codename Database</a>
+    <a class="nav-link" href="index.html">Weapon Database</a>
     </li>
     <li class="nav-item">
-    <a class="nav-link" href="gear.html">Gear Codename Database</a>
+    <a class="nav-link" href="gear.html">Gear Database</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="stage.html">Stage Database</a>
     </li>
 </ul>`)
 }
@@ -41,26 +44,34 @@ export function format_img(base_url, value, width) {
     return get_image_tag(`${base_url}${value}.png`, "", `width="${width}"`)
 }
 
-export function add_tab(tab_name, tab_label) {
+export function add_tab(tab_name, tab_label, visible = true) {
     const first = $("#modes").children().length == 0
-    $("#modes").append(`
-    <li class="nav-item">
-    <a
-        class="nav-link${first ? " active" : ""}"
-        id="${tab_name}-tab"
-        data-toggle="tab"
-        href="#${tab_name}"
-        role="tab"
-        aria-controls="${tab_name}"
-        aria-selected="true"
-        >${tab_label}</a
-    >
-</li>`)
-    $("#modeTabControl").append(`
-    <div class="tab-pane fade show${
-        first ? " active" : ""
-    }" id="${tab_name}" role="tabpanel" aria-labelledby="${tab_name}-tab"></div>    
-    `)
+    if (visible) {
+        $("#modes").append(`
+        <li class="nav-item">
+        <a
+            class="nav-link${first ? " active" : ""}"
+            id="${tab_name}-tab"
+            data-toggle="tab"
+            href="#${tab_name}"
+            role="tab"
+            aria-controls="${tab_name}"
+            aria-selected="true"
+            >${tab_label}</a
+        >
+    </li>`)
+        $("#modeTabControl").append(`
+        <div class="tab-pane fade show${
+            first ? " active" : ""
+        }" id="${tab_name}" role="tabpanel" aria-labelledby="${tab_name}-tab"></div>    
+        `)
+    } else {
+        $("#modeTabControl").append(`
+        <div class="tab-pane fade show${
+            first ? " active" : ""
+        }" id="${tab_name}" role="tabpanel" aria-labelledby="${tab_name}-tab"></div>    
+        `)
+    }
 }
 
 export function add_table(tab_name, tabale_name, table_configuration, header_name) {
@@ -107,7 +118,5 @@ export function evaluate_string(value) {
 }
 
 export function get_latest() { // Non functional currently
-    $.get("https://raw.githubusercontent.com/Leanny/splat3/main/data/mush/latest", data => {
-        return data
-    }, "text");
+    return 700
 }

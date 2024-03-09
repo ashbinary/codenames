@@ -28,7 +28,7 @@
         ></script>
         <script defer src="https://leanny.github.io/splat3/js/dist/json-formatter.umd.js" charset="UTF-8"></script>
         <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
-        <title>Splatoon 3 - Gear Codename Database</title>
+        <title>Splatoon 3 - Salmon Run Enemy Codename Database</title>
         <style>
             body {
                 background-color: #e9ecef;
@@ -67,7 +67,7 @@
     </head>
     <body>
         <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-            <a class="navbar-brand" href="#">Gear Codename Database</a>
+            <a class="navbar-brand" href="#">SR Enemy Codename Database</a>
             <button
                 class="navbar-toggler"
                 type="button"
@@ -84,7 +84,7 @@
         <main role="main">
             <div class="jumbotron">
                 <div class="col-sm-8 mx-auto">
-                    <h1>Splatoon 3 - Gear Codename Database</h1>
+                    <h1>Splatoon 3 - SR Enemy Codename Database</h1>
                     <ul class="nav nav-tabs" id="modes" role="tablist"></ul>
                     <div class="tab-content" id="modeTabControl"></div>
                     <div id="content"></div>
@@ -105,42 +105,19 @@
                 const prefix = get_prefix()
                 const site_prefix = "https://leanny.github.io/splat3/"
                 var latest = get_latest()
+                console.log(latest)
                 var lang_dict = {}
 
-                var adjustFormatter = value => {
-                    switch (value) {
-                        case 0:
-                            return `<p>No</p>`
-                        case 1:
-                            return `<p>Yes</p>`
-                    }
+                var imageFormatter = value =>
+                    `<center>${format_img(site_prefix + "images/stage/", value.replace(/[0-9]/g, ""))}</center>`
+
+                var nameFormatter = value => {
+                    const tname = localize("CommonMsg/VS/VSStageName", value.replace("Vss_", "").replace(/[0-9]/g, ""))
+                    return tname
                 }
 
-                var gearImgFormatter = value =>
-                    `<center>${format_img(site_prefix + "images/gear/", value, 128)}</center>`
-
-                var headFormatter = value => {
-                    const tname = localize("CommonMsg/Gear/GearName_Head", value.replace("Hed_", ""))
-                    return `<p>${tname}</p>`
-                }
-
-                var clothingFormatter = value => {
-                    const tname = localize("CommonMsg/Gear/GearName_Clothes", value.replace("Clt_", ""))
-                    return `<p>${tname}</p>`
-                }
-
-                var shoesFormatter = value => {
-                    const tname = localize("CommonMsg/Gear/GearName_Shoes", value.replace("Shs_", ""))
-                    return `<p>${tname}</p>`
-                }
-
-                window.adjustFormatter = adjustFormatter
-
-                window.headFormatter = headFormatter
-                window.clothingFormatter = clothingFormatter
-                window.shoesFormatter = shoesFormatter
-
-                window.gearImgFormatter = gearImgFormatter
+                window.nameFormatter = nameFormatter
+                window.imageFormatter = imageFormatter
 
                 window.lang_dict = lang_dict
                 $.getJSON("https://leanny.github.io/splat3/data/language/USen.json", function (d) {
@@ -151,40 +128,15 @@
                 })
 
                 function load_data() {
-                    $.getJSON(site_prefix + `data/mush/${latest}/GearInfoClothes.json`, data_dict => {
+                    $.getJSON(site_prefix + `data/mush/${latest}/VersusSceneInfo.json`, data_dict => {
                             var res = []
                             for (const value of data_dict) {
                                 res.push({
                                     name: value.__RowId,
-                                    id: value.Id,
-                                    variations: value.VariationNum
+                                    id: value.Id
                                 })
                             }
-                            $(`#cloth-table`).bootstrapTable("refreshOptions", { data: res, sortName: "SortId" })
-                        }
-                    )
-                    $.getJSON(site_prefix + `data/mush/${latest}/GearInfoShoes.json`, data_dict => {
-                            var res = []
-                            for (const value of data_dict) {
-                                res.push({
-                                    name: value.__RowId,
-                                    id: value.Id,
-                                    variations: value.VariationNum
-                                })
-                            }
-                            $(`#shoe-table`).bootstrapTable("refreshOptions", { data: res, sortName: "SortId" })
-                        }
-                    )
-                    $.getJSON(site_prefix + `data/mush/${latest}/GearInfoHead.json`, data_dict => {
-                            var res = []
-                            for (const value of data_dict) {
-                                res.push({
-                                    name: value.__RowId,
-                                    id: value.Id,
-                                    variations: value.VariationNum
-                                })
-                            }
-                            $(`#head-table`).bootstrapTable("refreshOptions", { data: res, sortName: "SortId" })
+                            $(`#stage-table`).bootstrapTable("refreshOptions", { data: res, sortName: "SortId" })
                         }
                     )
                 }
@@ -193,15 +145,13 @@
                     $("#version").change(function () {
                         load_data()
                     })
-                    add_tab("head", "Headgear")
-                    add_tab("cloth", "Clothes")
-                    add_tab("shoe", "Shoes")
+                    add_tab("stage", "Stages", false)
 
-                    add_table("head", "head-table", [
+                    add_table("stage", "stage-table", [
                         {
                             Field: "name",
                             Label: "Image",
-                            formatter: "gearImgFormatter"
+                            formatter: "imageFormatter"
                         },
                         {
                             Field: "name",
@@ -210,69 +160,12 @@
                         {
                             Field: "name",
                             Label: "Name",
-                            formatter: "headFormatter"
+                            formatter: "nameFormatter"
                         },
                         {
                             Field: "id",
-                            Label: "Gear ID"
-                        },
-                        {
-                            Field: "variations",
-                            Label: "Adjustable?",
-                            formatter: "adjustFormatter"
-                        },
-                    ])
-
-                    add_table("cloth", "cloth-table", [
-                        {
-                            Field: "name",
-                            Label: "Image",
-                            formatter: "gearImgFormatter"
-                        },
-                        {
-                            Field: "name",
-                            Label: "Internal Name"
-                        },
-                        {
-                            Field: "name",
-                            Label: "Name",
-                            formatter: "clothingFormatter"
-                        },
-                        {
-                            Field: "id",
-                            Label: "Gear ID"
-                        },
-                        {
-                            Field: "variations",
-                            Label: "Adjustable?",
-                            formatter: "adjustFormatter"
-                        },
-                    ])
-
-                    add_table("shoe", "shoe-table", [
-                        {
-                            Field: "name",
-                            Label: "Image",
-                            formatter: "gearImgFormatter"
-                        },
-                        {
-                            Field: "name",
-                            Label: "Internal Name"
-                        },
-                        {
-                            Field: "name",
-                            Label: "Name",
-                            formatter: "shoesFormatter"
-                        },
-                        {
-                            Field: "id",
-                            Label: "Gear ID"
-                        },
-                        {
-                            Field: "variations",
-                            Label: "Adjustable?",
-                            formatter: "adjustFormatter"
-                        },
+                            Label: "Stage ID"
+                        }
                     ])
                 })
             </script>
