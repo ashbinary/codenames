@@ -157,7 +157,9 @@
                                 res.push({
                                     name: value.__RowId,
                                     id: value.Id,
-                                    variations: value.VariationNum
+                                    variations: value.VariationNum,
+                                    alphaMask: value.AlphaMaskM,
+                                    alphaFask: value.AlphaMaskF
                                 })
                             }
                             $(`#cloth-table`).bootstrapTable("refreshOptions", { data: res, sortName: "SortId" })
@@ -241,6 +243,14 @@
                         {
                             Field: "id",
                             Label: "Gear ID"
+                        },
+                        {
+                            Field: "alphaMask",
+                            Label: "Alpha Mask (Male)"
+                        },
+                        {
+                            Field: "alphaFask",
+                            Label: "Alpha Mask (Female)"
                         },
                         {
                             Field: "variations",
