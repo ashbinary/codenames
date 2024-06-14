@@ -118,5 +118,5 @@ export function evaluate_string(value) {
 }
 
 export function get_latest() { // Non functional currently
-    return 700
+    return 800
 }
