@@ -16,7 +16,7 @@ export function generateHeader(elem) {
 export function generateFooter(elem) {
     elem.append(`<div class="container text-muted">
     <div class="footer-notice">
-        <p>Webpage created by ashbinary, using <a href="https://leanny.github.io/">Lean's webpage</a> as a template. Framework used is <a href="https://getbootstrap.com/">Bootstrap</a>. <a href="https://github.com/OatmealDome/OatmealDome.NinLib.MessageStudio">Message Lib</a> by <a href="https://twitter.com/OatmealDome">OatmealDome <span class="fa fa-twitter">.</p>
+        <p>Original website made by <a href="https://leanny.github.io/">LeanYoshi</a>. Framework used is <a href="https://getbootstrap.com/">Bootstrap</a>. <a href="https://github.com/OatmealDome/OatmealDome.NinLib.MessageStudio">Message Lib</a> by <a href="https://twitter.com/OatmealDome">OatmealDome <span class="fa fa-twitter">.</p>
     </div>
 </div>`)
 }
@@ -118,5 +118,5 @@ export function evaluate_string(value) {
 }
 
 export function get_latest() { // Non functional currently
-    return 920
+    return 1120
 }
